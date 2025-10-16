@@ -1,14 +1,16 @@
-import express from "express";
-import dotenv from "dotenv";
-import db from "./src/config/db.js";
-
-dotenv.config();
+import express from 'express';
+import pacientesRoutes from './src/routes/pacientesRoutes.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
 app.use(express.json());
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+// Rota de pacientes
+app.use('/api/pacientes', pacientesRoutes);
+
+// Rota de teste
+app.get('/', (req, res) => {
+  res.send('Servidor e banco de dados conectados com sucesso ✅');
 });
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Servidor rodando em http://localhost:${PORT}`));
