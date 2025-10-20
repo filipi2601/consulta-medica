@@ -1,28 +1,16 @@
-import express from 'express';
-import { getPacientes, addPaciente, initPacientesTable } from '../models/pacientesModel.js';
+import express from "express";
+import {
+  listarPacientes,
+  criarPaciente,
+  editarPaciente,
+  deletarPaciente,
+} from "../controllers/pacientesController.js";
 
 const router = express.Router();
 
-initPacientesTable();
-
-// GET /api/pacientes
-router.get('/', async (req, res) => {
-  try {
-    const pacientes = await getPacientes();
-    res.json(pacientes);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// POST /api/pacientes
-router.post('/', async (req, res) => {
-  try {
-    const novo = await addPaciente(req.body);
-    res.status(201).json(novo);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+router.get("/pacientes", listarPacientes);
+router.post("/pacientes", criarPaciente);
+router.put("/pacientes/:id", editarPaciente);
+router.delete("/pacientes/:id", deletarPaciente);
 
 export default router;

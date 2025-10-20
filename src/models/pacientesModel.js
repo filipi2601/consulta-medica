@@ -1,30 +1,47 @@
-import { connectDB } from '../config/db.js';
-
-export async function initPacientesTable() {
-  const db = await connectDB();
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS pacientes (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      nome VARCHAR(100) NOT NULL,
-      data_nascimento DATE NOT NULL,
-      telefone VARCHAR(20) NOT NULL,
-      email VARCHAR(100) UNIQUE NOT NULL
-    );
-  `);
-  console.log('🧱 Tabela "pacientes" pronta.');
-}
+import { connectDB } from "../config/db.js";
 
 export async function getPacientes() {
   const db = await connectDB();
-  const [rows] = await db.query('SELECT * FROM pacientes');
+  const [rows] = await db.query("SELECT * FROM pacientes");
   return rows;
 }
 
-export async function addPaciente({ nome, data_nascimento, telefone, email }) {
+export async function addPaciente({
+  nome,
+  cpf,
+  data_nascimento,
+  telefone,
+  email,
+}) {
   const db = await connectDB();
   const [result] = await db.query(
-    'INSERT INTO pacientes (nome, data_nascimento, telefone, email) VALUES (?, ?, ?, ?)',
-    [nome, data_nascimento, telefone, email]
+    "INSERT INTO pacientes (nome, cpf, data_nascimento, telefone, email) VALUES (?, ?, ?, ?, ?)",
+    [nome, cpf, data_nascimento, telefone, email]
   );
-  return { id: result.insertId, nome, data_nascimento, telefone, email };
+  return { id: result.insertId, nome, cpf, data_nascimento, telefone, email };
+}
+
+export async function updatePaciente(
+  id,
+  { nome, cpf, data_nascimento, telefone, email }
+) {
+  const db = await connectDB();
+  await db.query(
+    `UPDATE pacientes
+     SET nome = ?, cpf = ?, data_nascimento = ?, telefone = ?, email = ?
+     WHERE id = ?`,
+    [nome, cpf, data_nascimento, telefone, email, id]
+  );
+  return { id, nome, cpf, data_nascimento, telefone, email };
+}
+
+export async function deletePaciente(id) {
+  const db = await connectDB();
+  await db.query("DELETE FROM consultas WHERE idPaciente = ?", [id]);
+
+  const [result] = await db.query("DELETE FROM pacientes WHERE id = ?", [id]);
+
+  if (result.affectedRows === 0) {
+    throw new Error("Paciente não encontrado");
+  }
 }

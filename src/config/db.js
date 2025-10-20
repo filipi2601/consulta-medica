@@ -14,7 +14,7 @@ export async function connectDB() {
       database: process.env.DB_NAME,
       port: process.env.DB_PORT,
     });
-    console.log('✅ Conectado ao banco de dados MySQL.');
+    console.log('Conectado ao banco de dados MySQL.');
   }
   return db;
 }
