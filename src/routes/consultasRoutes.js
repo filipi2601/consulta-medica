@@ -1,11 +1,17 @@
-import * as consultaController from '../controllers/consultaController.js';
-import { Router } from 'express';
+import {
+  agendarConsulta,
+  listarConsultas,
+  buscarConsultaPorId,
+  atualizarConsulta,
+  cancelarConsulta,
+} from "../controllers/consultaController.js";
+import { Router } from "express";
 
 const router = Router();
-router.post('/', consultaController.agendarConsulta);
-router.get('/', consultaController.listarConsultas);
-router.get('/:id', consultaController.buscarConsultaPorId);
-router.put('/:id', consultaController.atualizarConsulta);
-router.delete('/:id', consultaController.cancelarConsulta);
+router.post("/", agendarConsulta);
+router.get("/", listarConsultas);
+router.get("/:id", buscarConsultaPorId);
+router.put("/:id", atualizarConsulta);
+router.delete("/:id", cancelarConsulta);
 
 export default router;
