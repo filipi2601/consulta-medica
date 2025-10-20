@@ -1,4 +1,5 @@
 import express from 'express';
+import especialidadesRoutes from './routes/especialidadesRoutes.js';
 import pacientesRoutes from './routes/pacientesRoutes.js';
 import consultaRoutes from './routes/consultasRoutes.js';
 import { connectDB } from './config/db.js';
@@ -6,6 +7,7 @@ import { connectDB } from './config/db.js';
 const app = express();
 app.use(express.json());
 app.use('/api/consultas', consultaRoutes);
+app.use('/api/especialidades', especialidadesRoutes);
 app.use('/api/pacientes', pacientesRoutes);
 
 app.get('/', async (req, res) => {

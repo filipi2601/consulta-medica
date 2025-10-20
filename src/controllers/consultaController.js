@@ -2,9 +2,9 @@ import * as consultaService from '../services/consultaService.js';
 
 export async function agendarConsulta(req, res) {
   try {
-    const { idPaciente, idMedico, data_agendamentoConsulta } = req.body;
+    const { id_paciente, id_medico, data_agendamento } = req.body;
     
-    const novaConsulta = await consultaService.agendar(idPaciente, idMedico, data_agendamentoConsulta);
+    const novaConsulta = await consultaService.agendar(id_paciente, id_medico, data_agendamento);
     res.status(201).json(novaConsulta);
 
   } catch (error) {

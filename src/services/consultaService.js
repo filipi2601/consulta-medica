@@ -1,32 +1,32 @@
 import * as consultaModel from '../models/consultasModel.js';
 
-export async function agendar(idPaciente, idMedico, dataAgendamento) {
+export async function agendar(id_paciente, id_medico, data_agendamento) {
   
-  if (!idPaciente || !idMedico || !dataAgendamento) {
+  if (!id_paciente || !id_medico || !data_agendamento) {
     throw new Error('ID do Paciente, ID do Médico e Data de Agendamento são obrigatórios.');
   }
 
   const agora = new Date();
-  const dataDaConsulta = new Date(dataAgendamento);
+  const dataDaConsulta = new Date(data_agendamento);
 
   if (dataDaConsulta < agora) {
     throw new Error('Não é possível agendar consultas em datas ou horários passados.');
   }
   
-  const conflitoPaciente = await consultaModel.findByPacienteAndHorario(idPaciente, dataAgendamento);
+  const conflitoPaciente = await consultaModel.findByPacienteAndHorario(id_paciente, data_agendamento);
   if (conflitoPaciente) {
     throw new Error('O paciente já possui uma consulta agendada neste intervalo de horário.');
   }
 
-  const conflitoMedico = await consultaModel.findByMedicoAndHorario(idMedico, dataAgendamento);
+  const conflitoMedico = await consultaModel.findByMedicoAndHorario(id_medico, data_agendamento);
   if (conflitoMedico) {
     throw new Error('O médico não está disponível neste intervalo de horário.');
   }
 
   const novaConsultaId = await consultaModel.create({
-    idPaciente,
-    idMedico,
-    data_agendamentoConsulta: dataAgendamento
+    id_paciente,
+    id_medico,
+    data_agendamento: data_agendamento
   });
 
   return consultaModel.findById(novaConsultaId);

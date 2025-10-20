@@ -1,14 +1,14 @@
 import { connectDB } from '../config/db.js';
 
-export async function create({ idPaciente, idMedico, data_agendamentoConsulta }) {
+export async function create({ id_paciente, id_medico, data_agendamento }) {
   const db = await connectDB();
   const sql = `
-    INSERT INTO Consultas (idPaciente, idMedico, data_agendamentoConsulta) 
+    INSERT INTO Consultas (id_paciente, id_medico, data_agendamento) 
     VALUES (?, ?, ?)
   `;
   
   try {
-    const [result] = await db.query(sql, [idPaciente, idMedico, data_agendamentoConsulta]);
+    const [result] = await db.query(sql, [id_paciente, id_medico, data_agendamento]);
     return result.insertId;
   } catch (error) {
     console.error('Erro ao criar consulta no modelo:', error);
@@ -20,17 +20,17 @@ export async function findAll() {
   const db = await connectDB();
   const sql = `
     SELECT 
-      c.idConsulta,
-      c.data_agendamentoConsulta,
-      c.statusConsulta,
-      c.observacoesConsulta,
-      p.idPaciente,
-      p.nomePaciente,
-      m.idMedico,
-      m.nomeMedico
+      c.id,
+      c.data_agendamento,
+      c.status,
+      c.observacoes,
+      p.id,
+      p.nome,
+      m.id,
+      m.nome
     FROM Consultas c
-    JOIN Pacientes p ON c.idPaciente = p.idPaciente
-    JOIN Medicos m ON c.idMedico = m.idMedico
+    JOIN Pacientes p ON c.id_paciente = p.id
+    JOIN Medicos m ON c.id_medico = m.id
   `;
   
   try {
@@ -46,18 +46,18 @@ export async function findById(id) {
   const db = await connectDB();
   const sql = `
     SELECT 
-      c.idConsulta,
-      c.data_agendamentoConsulta,
-      c.statusConsulta,
-      c.observacoesConsulta,
-      p.idPaciente,
-      p.nomePaciente,
-      m.idMedico,
-      m.nomeMedico
+      c.id,
+      c.data_agendamento,
+      c.status,
+      c.observacoes,
+      p.id as paciente_id,
+      p.nome as nome_paciente,
+      m.id as medico_id,
+      m.nome as nome_medico
     FROM Consultas c
-    JOIN Pacientes p ON c.idPaciente = p.idPaciente
-    JOIN Medicos m ON c.idMedico = m.idMedico
-    WHERE c.idConsulta = ?
+    JOIN Pacientes p ON c.id_paciente = p.id
+    JOIN Medicos m ON c.id_medico = m.id
+    WHERE c.id = ?
   `;
   
   try {
@@ -75,7 +75,7 @@ export async function update(id, dadosParaAtualizar) {
   const campos = Object.keys(dadosParaAtualizar).map(key => `${key} = ?`).join(', ');
   const valores = Object.values(dadosParaAtualizar);
   
-  const sql = `UPDATE Consultas SET ${campos} WHERE idConsulta = ?`;
+  const sql = `UPDATE Consultas SET ${campos} WHERE id = ?`;
 
   try {
     const [result] = await db.query(sql, [...valores, id]);
@@ -88,7 +88,7 @@ export async function update(id, dadosParaAtualizar) {
 
 export async function remove(id) {
   const db = await connectDB();
-  const sql = `DELETE FROM Consultas WHERE idConsulta = ?`;
+  const sql = `DELETE FROM Consultas WHERE id = ?`;
 
   try {
     const [result] = await db.query(sql, [id]);
@@ -99,17 +99,17 @@ export async function remove(id) {
   }
 }
 
-export async function findByMedicoAndHorario(idMedico, dataAgendamento) {
+export async function findByMedicoAndHorario(id_medico, data_agendamento) {
   const db = await connectDB();
   const sql = `
     SELECT * FROM Consultas 
-    WHERE idMedico = ? 
-    AND statusConsulta = 'Agendada'
-    AND data_agendamentoConsulta BETWEEN (? - INTERVAL 59 MINUTE) AND (? + INTERVAL 59 MINUTE);
+    WHERE id_medico = ? 
+    AND status = 'Agendada'
+    AND data_agendamento BETWEEN (? - INTERVAL 59 MINUTE) AND (? + INTERVAL 59 MINUTE);
   `;
   
   try {
-    const [rows] = await db.query(sql, [idMedico, dataAgendamento, dataAgendamento]);
+    const [rows] = await db.query(sql, [id_medico, data_agendamento, data_agendamento]);
     return rows[0];
   } catch (error) {
     console.error('Erro ao verificar conflito de médico no modelo:', error);
@@ -117,17 +117,17 @@ export async function findByMedicoAndHorario(idMedico, dataAgendamento) {
   }
 }
 
-export async function findByPacienteAndHorario(idPaciente, dataAgendamento) {
+export async function findByPacienteAndHorario(id_paciente, data_agendamento) {
   const db = await connectDB();
   const sql = `
     SELECT * FROM Consultas 
-    WHERE idPaciente = ? 
-    AND statusConsulta = 'Agendada'
-    AND data_agendamentoConsulta BETWEEN (? - INTERVAL 59 MINUTE) AND (? + INTERVAL 59 MINUTE);
+    WHERE id_paciente = ? 
+    AND status = 'Agendada'
+    AND data_agendamento BETWEEN (? - INTERVAL 59 MINUTE) AND (? + INTERVAL 59 MINUTE);
   `;
   
   try {
-    const [rows] = await db.query(sql, [idPaciente, dataAgendamento, dataAgendamento]);
+    const [rows] = await db.query(sql, [id_paciente, data_agendamento, data_agendamento]);
     return rows[0];
   } catch (error) {
     console.error('Erro ao verificar conflito de paciente no modelo:', error);

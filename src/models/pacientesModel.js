@@ -37,7 +37,7 @@ export async function updatePaciente(
 
 export async function deletePaciente(id) {
   const db = await connectDB();
-  await db.query("DELETE FROM consultas WHERE idPaciente = ?", [id]);
+  await db.query("DELETE FROM consultas WHERE id_paciente = ?", [id]);
 
   const [result] = await db.query("DELETE FROM pacientes WHERE id = ?", [id]);
 
