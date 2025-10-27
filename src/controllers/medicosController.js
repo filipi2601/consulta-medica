@@ -18,7 +18,6 @@ export async function createMedico(req, res) {
     const medico = await medicosModel.addMedico({ nome, crm, email });
     return res.status(201).json(medico);
   } catch (err) {
-    // ER_DUP_ENTRY do MySQL será retornado em duplicidade de crm/email
     return res.status(500).json({ error: err.message });
   }
 }
@@ -36,11 +35,11 @@ export async function updateMedico(req, res) {
 
 export async function deleteMedico(req, res) {
   try {
-    const id = Number(req.params.id);
+    const id = req.params.id;
     await medicosModel.deleteMedico(id);
     return res.status(204).send();
   } catch (err) {
-    if (err.message.includes("não encontrado")) {
+    if (err) {
       return res.status(404).json({ error: err.message });
     }
     return res.status(500).json({ error: err.message });

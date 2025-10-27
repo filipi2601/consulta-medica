@@ -26,7 +26,6 @@ export async function updateMedico(id, { nome, crm, email }) {
 
 export async function deleteMedico(id) {
   const db = await connectDB();
-  // Consultas tem FK com ON DELETE RESTRICT; remover consultas antes de excluir médico
   await db.query("DELETE FROM `Consultas` WHERE id_medico = ?", [id]);
 
   const [result] = await db.query("DELETE FROM `Medicos` WHERE id = ?", [id]);
