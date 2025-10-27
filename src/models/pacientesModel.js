@@ -6,6 +6,32 @@ export async function getPacientes() {
   return rows;
 }
 
+export async function findById(id) {
+  const db = await connectDB();
+  const [rows] = await db.query("SELECT * FROM pacientes WHERE id = ?", [id]);
+  return rows[0];
+}
+
+export async function findByEmail(email) {
+  const db = await connectDB();
+  const [rows] = await db.query(
+    "SELECT * FROM pacientes WHERE LOWER(email) = LOWER(?) LIMIT 1",
+    [email]
+  );
+  return rows[0];
+}
+
+export async function findByCpfDigits(cpfDigits) {
+  const db = await connectDB();
+  const [rows] = await db.query(
+    `SELECT * FROM pacientes
+     WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), '/', '') = ?
+     LIMIT 1`,
+    [cpfDigits]
+  );
+  return rows[0];
+}
+
 export async function addPaciente({
   nome,
   cpf,
@@ -21,18 +47,23 @@ export async function addPaciente({
   return { id: result.insertId, nome, cpf, data_nascimento, telefone, email };
 }
 
-export async function updatePaciente(
-  id,
-  { nome, cpf, data_nascimento, telefone, email }
-) {
+export async function updatePaciente(id, camposParaAtualizar) {
   const db = await connectDB();
-  await db.query(
-    `UPDATE pacientes
-     SET nome = ?, cpf = ?, data_nascimento = ?, telefone = ?, email = ?
-     WHERE id = ?`,
-    [nome, cpf, data_nascimento, telefone, email, id]
+  const campos = Object.keys(camposParaAtualizar);
+
+  if (campos.length === 0) {
+    return false;
+  }
+
+  const setClause = campos.map((campo) => `${campo} = ?`).join(", ");
+  const valores = campos.map((campo) => camposParaAtualizar[campo]);
+
+  const [result] = await db.query(
+    `UPDATE pacientes SET ${setClause} WHERE id = ?`,
+    [...valores, id]
   );
-  return { id, nome, cpf, data_nascimento, telefone, email };
+
+  return result.affectedRows > 0;
 }
 
 export async function deletePaciente(id) {
@@ -41,7 +72,5 @@ export async function deletePaciente(id) {
 
   const [result] = await db.query("DELETE FROM pacientes WHERE id = ?", [id]);
 
-  if (result.affectedRows === 0) {
-    throw new Error("Paciente não encontrado");
-  }
+  return result.affectedRows > 0;
 }

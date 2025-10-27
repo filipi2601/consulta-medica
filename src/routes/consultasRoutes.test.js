@@ -45,7 +45,9 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  await db.end();
+  if (db) {
+    await db.end();
+  }
 });
 
 describe('Testes de Integração do CRUD de Consultas (/api/consultas)', () => {
