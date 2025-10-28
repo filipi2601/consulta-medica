@@ -20,16 +20,16 @@ export async function findAll() {
   const db = await connectDB();
   const sql = `
     SELECT 
-      c.id,
+      c.id AS idConsulta,
       c.data_agendamento,
       c.status,
       c.observacoes,
-      p.id,
-      p.nome,
-      m.id,
-      m.nome
+      p.id AS idPaciente,    -- Alias explícito para ID do Paciente
+      p.nome AS nomePaciente, -- Alias explícito para Nome do Paciente
+      m.id AS idMedico,      -- Alias explícito para ID do Médico
+      m.nome AS nomeMedico   -- Alias explícito para Nome do Médico
     FROM Consultas c
-    JOIN Pacientes p ON c.id_paciente = p.id
+    JOIN Pacientes p ON c.id_paciente = p.id 
     JOIN Medicos m ON c.id_medico = m.id
   `;
   
@@ -46,18 +46,18 @@ export async function findById(id) {
   const db = await connectDB();
   const sql = `
     SELECT 
-      c.id,
+      c.id AS idConsulta,
       c.data_agendamento,
       c.status,
       c.observacoes,
-      p.id as paciente_id,
-      p.nome as nome_paciente,
-      m.id as medico_id,
-      m.nome as nome_medico
+      p.id AS idPaciente,
+      p.nome AS nomePaciente,
+      m.id AS idMedico,
+      m.nome AS nomeMedico
     FROM Consultas c
     JOIN Pacientes p ON c.id_paciente = p.id
     JOIN Medicos m ON c.id_medico = m.id
-    WHERE c.id = ?
+    WHERE c.id = ? 
   `;
   
   try {

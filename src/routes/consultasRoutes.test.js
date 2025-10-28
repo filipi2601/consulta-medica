@@ -45,7 +45,9 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  await db.end();
+  if (db) {
+    await db.end();
+  }
 });
 
 describe('Testes de Integração do CRUD de Consultas (/api/consultas)', () => {
@@ -64,9 +66,9 @@ describe('Testes de Integração do CRUD de Consultas (/api/consultas)', () => {
         .send(novaConsulta);
 
       expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('id');
-      expect(response.body.nome_paciente).toBe('Ana Silva');
-      expect(response.body.nome_medico).toBe('Dr. Carlos Oliveira');
+      expect(response.body).toHaveProperty('idConsulta');
+      expect(response.body.nomePaciente).toBe('Ana Silva');
+      expect(response.body.nomeMedico).toBe('Dr. Carlos Oliveira');
     });
 
     it('deve retornar erro 400 se faltar o id_medico', async () => {
@@ -165,8 +167,8 @@ describe('Testes de Integração do CRUD de Consultas (/api/consultas)', () => {
         .get('/api/consultas/1');
 
       expect(response.status).toBe(200);
-      expect(response.body.id).toBe(1);
-      expect(response.body.nome_paciente).toBe('Ana Silva');
+      expect(response.body.idConsulta).toBe(1);
+      expect(response.body.nomePaciente).toBe('Ana Silva');
     });
   });
   
@@ -189,8 +191,8 @@ describe('Testes de Integração do CRUD de Consultas (/api/consultas)', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.length).toBe(2);
-      expect(response.body[0].nome_paciente).toBe('Ana Silva');
-      expect(response.body[1].nome_paciente).toBe('Bruno Costa');
+      expect(response.body[0].nomePaciente).toBe('Ana Silva'); 
+      expect(response.body[1].nomePaciente).toBe('Bruno Costa');
     });
   });
 
@@ -206,7 +208,7 @@ describe('Testes de Integração do CRUD de Consultas (/api/consultas)', () => {
         .send(atualizacao);
 
       expect(response.status).toBe(200);
-      expect(response.body.id).toBe(1);
+      expect(response.body.idConsulta).toBe(1);
       expect(response.body.status).toBe('Realizada');
       expect(response.body.observacoes).toBe('Paciente compareceu.');
     });
