@@ -1,47 +1,59 @@
-import * as medicosModel from "../models/medicosModel.js";
+import * as medicoService from "../services/medicoService.js";
+
+function mapErrorToStatus(error) {
+  if (error.message.includes("nao encontrado")) {
+    return 404;
+  }
+
+  if (
+    error.message.includes("Ja existe") ||
+    error.message.includes("invalido") ||
+    error.message.includes("devem ser informados") ||
+    error.message.includes("nao pode")
+  ) {
+    return 400;
+  }
+
+  return 500;
+}
 
 export async function getMedicos(req, res) {
   try {
-    const medicos = await medicosModel.getMedicos();
+    const medicos = await medicoService.listar();
     return res.json(medicos);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 }
 
 export async function createMedico(req, res) {
   try {
-    const { nome, crm, email } = req.body;
-    if (!nome || !crm) {
-      return res.status(400).json({ error: "nome e crm são obrigatórios" });
-    }
-    const medico = await medicosModel.addMedico({ nome, crm, email });
+    const medico = await medicoService.criar(req.body);
     return res.status(201).json(medico);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+  } catch (error) {
+    const status = mapErrorToStatus(error);
+    return res.status(status).json({ message: error.message });
   }
 }
 
 export async function updateMedico(req, res) {
   try {
-    const id = Number(req.params.id);
-    const { nome, crm, email } = req.body;
-    const medico = await medicosModel.updateMedico(id, { nome, crm, email });
+    const { id } = req.params;
+    const medico = await medicoService.atualizar(id, req.body);
     return res.json(medico);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+  } catch (error) {
+    const status = mapErrorToStatus(error);
+    return res.status(status).json({ message: error.message });
   }
 }
 
 export async function deleteMedico(req, res) {
   try {
-    const id = req.params.id;
-    await medicosModel.deleteMedico(id);
+    const { id } = req.params;
+    await medicoService.remover(id);
     return res.status(204).send();
-  } catch (err) {
-    if (err) {
-      return res.status(404).json({ error: err.message });
-    }
-    return res.status(500).json({ error: err.message });
+  } catch (error) {
+    const status = mapErrorToStatus(error);
+    return res.status(status).json({ message: error.message });
   }
 }
