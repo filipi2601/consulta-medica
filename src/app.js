@@ -1,25 +1,29 @@
-import express from 'express';
-import especialidadesRoutes from './routes/especialidadesRoutes.js';
-import pacientesRoutes from './routes/pacientesRoutes.js';
-import consultaRoutes from './routes/consultasRoutes.js';
-import medicosRoutes from './routes/medicosRoutes.js';
-import { connectDB } from './config/db.js';
+import express from "express";
+import especialidadesRoutes from "./routes/especialidadesRoutes.js";
+import pacientesRoutes from "./routes/pacientesRoutes.js";
+import consultaRoutes from "./routes/consultasRoutes.js";
+import medicosRoutes from "./routes/medicosRoutes.js";
+import medicoEspecialidadeRoute from "./routes/medicoEspecialidadeRoutes.js";
+import { connectDB } from "./config/db.js";
 
 const app = express();
 app.use(express.json());
-app.use('/api/consultas', consultaRoutes);
-app.use('/api/especialidades', especialidadesRoutes);
-app.use('/api/pacientes', pacientesRoutes);
-app.use('/api/medicos', medicosRoutes);
+app.use("/api/consultas", consultaRoutes);
+app.use("/api/especialidades", especialidadesRoutes);
+app.use("/api/pacientes", pacientesRoutes);
+app.use("/api/medicos", medicosRoutes);
+app.use("/api/medico-especialidade", medicoEspecialidadeRoute);
 
-app.get('/', async (req, res) => {
+app.get("/", async (req, res) => {
   try {
     const db = await connectDB();
-    await db.query('SELECT 1'); 
-    res.send('Servidor e banco de dados conectados com sucesso ✅');
+    await db.query("SELECT 1");
+    res.send("Servidor e banco de dados conectados com sucesso ✅");
   } catch (error) {
-    console.error('Erro ao conectar com o banco:', error);
-    res.status(500).send('Servidor no ar, mas FALHA ao conectar com o banco de dados ❌');
+    console.error("Erro ao conectar com o banco:", error);
+    res
+      .status(500)
+      .send("Servidor no ar, mas FALHA ao conectar com o banco de dados ❌");
   }
 });
 
