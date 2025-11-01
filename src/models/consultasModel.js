@@ -24,10 +24,10 @@ export async function findAll() {
       c.data_agendamento,
       c.status,
       c.observacoes,
-      p.id AS idPaciente,    -- Alias explícito para ID do Paciente
-      p.nome AS nomePaciente, -- Alias explícito para Nome do Paciente
-      m.id AS idMedico,      -- Alias explícito para ID do Médico
-      m.nome AS nomeMedico   -- Alias explícito para Nome do Médico
+      p.id AS idPaciente,
+      p.nome AS nomePaciente,
+      m.id AS idMedico,
+      m.nome AS nomeMedico
     FROM Consultas c
     JOIN Pacientes p ON c.id_paciente = p.id 
     JOIN Medicos m ON c.id_medico = m.id
