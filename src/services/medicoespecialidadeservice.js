@@ -2,12 +2,12 @@ import * as medicoEspecialidadeModel from "../models/medicoEspecialidadeModel.js
 import * as medicoModel from "../models/medicoModel.js";
 import * as especialidadeModel from "../models/especialidadeModel.js";
 
-// 🔹 Listar todos os vínculos médico ↔ especialidade
+//  Listar todos os vínculos médico ↔ especialidade
 export async function listarTodosVinculos() {
   return medicoEspecialidadeModel.getAllVinculos();
 }
 
-// 🔹 Listar especialidades de um médico específico
+//  Listar especialidades de um médico específico
 export async function listarEspecialidadesMedico(id_medico) {
   if (!id_medico) {
     throw new Error("ID do médico é obrigatório.");
@@ -21,7 +21,7 @@ export async function listarEspecialidadesMedico(id_medico) {
   return medicoEspecialidadeModel.getEspecialidadesMedico(id_medico);
 }
 
-// 🔹 Vincular médico e especialidade
+//  Vincular médico e especialidade
 export async function vincularEspecialidade(id_medico, id_especialidade) {
   if (!id_medico || !id_especialidade) {
     throw new Error("ID do médico e ID da especialidade são obrigatórios.");
@@ -46,7 +46,7 @@ export async function vincularEspecialidade(id_medico, id_especialidade) {
   return medicoEspecialidadeModel.findVinculo(id_medico, id_especialidade);
 }
 
-// 🔹 Atualizar vínculo (alterar a especialidade de um médico)
+//  Atualizar vínculo (alterar a especialidade de um médico)
 export async function atualizarEspecialidade(id_medico, id_especialidade, novo_id_especialidade) {
   if (!id_medico || !id_especialidade || !novo_id_especialidade) {
     throw new Error("IDs do médico, especialidade atual e nova especialidade são obrigatórios.");
@@ -80,7 +80,7 @@ export async function atualizarEspecialidade(id_medico, id_especialidade, novo_i
   return medicoEspecialidadeModel.findVinculo(id_medico, novo_id_especialidade);
 }
 
-// 🔹 Remover vínculo
+//  Remover vínculo
 export async function removerEspecialidade(id_medico, id_especialidade) {
   if (!id_medico || !id_especialidade) {
     throw new Error("ID do médico e ID da especialidade são obrigatórios para remoção.");
