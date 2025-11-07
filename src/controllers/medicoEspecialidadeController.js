@@ -1,62 +1,57 @@
-import {
-  getAllVinculos,
-  getEspecialidadesMedico,
-  vincular,
-  atualizar,
-  remover
-} from "../models/medicoEspecialidadeModel.js";
+import * as medicoEspecialidadeService from "../services/medicoEspecialidadeService.js";
 
-// Listar todos os vínculos
 export async function listarTodosVinculos(req, res) {
   try {
-    const dados = await getAllVinculos();
-    res.json(dados);
+    const dados = await medicoEspecialidadeService.listarTodosVinculos();
+    return res.status(200).json(dados);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
 
-// Listar especialidades por médico
 export async function listarEspecialidadesMedico(req, res) {
   try {
     const { id_medico } = req.params;
-    const dados = await getEspecialidadesMedico(id_medico);
-    res.json(dados);
+    const dados = await medicoEspecialidadeService.listarEspecialidadesMedico(id_medico);
+    return res.status(200).json(dados);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
 
-// Vincular especialidade ao médico
 export async function vincularEspecialidade(req, res) {
   try {
     const { id_medico, id_especialidade } = req.body;
-    await vincular(id_medico, id_especialidade);
-    res.status(201).json({ message: "Vínculo criado com sucesso!" });
+    const resultado = await medicoEspecialidadeService.vincularEspecialidade(id_medico, id_especialidade);
+    return res.status(201).json(resultado);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(error.status || 400).json({ error: error.message });
   }
 }
 
-// Atualizar vínculo
 export async function atualizarEspecialidade(req, res) {
   try {
     const { id_medico, id_especialidade } = req.params;
     const { novo_id_especialidade } = req.body;
-    await atualizar(id_medico, id_especialidade, novo_id_especialidade);
-    res.json({ message: "Vínculo atualizado com sucesso!" });
+    const resultado = await medicoEspecialidadeService.atualizarEspecialidade(id_medico, id_especialidade, novo_id_especialidade);
+    return res.status(200).json(resultado);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(error.status || 400).json({ error: error.message });
   }
 }
 
-// Remover vínculo
 export async function removerEspecialidade(req, res) {
   try {
     const { id_medico, id_especialidade } = req.params;
-    await remover(id_medico, id_especialidade);
-    res.json({ message: "Vínculo removido com sucesso!" });
+    const vinculoExiste = await medicoEspecialidadeService.findVinculo(id_medico, id_especialidade);
+
+    if (!vinculoExiste) {
+      return res.status(404).json({ message: "Vínculo não encontrado" });
+    }
+
+    await medicoEspecialidadeService.removerEspecialidade(id_medico, id_especialidade);
+    return res.status(200).json({ message: "Vínculo removido com sucesso" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
