@@ -1,13 +1,13 @@
-import { Router } from "express";
+import express from "express";
 import {
   listarTodosVinculos,
   listarEspecialidadesMedico,
   vincularEspecialidade,
   atualizarEspecialidade,
-  removerEspecialidade
+  removerEspecialidade,
 } from "../controllers/medicoEspecialidadeController.js";
 
-const router = Router();
+const router = express.Router();
 
 router.get("/", listarTodosVinculos);
 router.get("/:id_medico", listarEspecialidadesMedico);

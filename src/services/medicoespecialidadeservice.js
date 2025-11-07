@@ -1,108 +1,107 @@
-import * as medicoEspecialidadeModel from "../models/medicoEspecialidadeModel.js";
-import * as medicoModel from "../models/medicoModel.js";
-import * as especialidadeModel from "../models/especialidadeModel.js";
+import { connectDB } from "../config/db.js";
 
-//  Listar todos os vínculos médico ↔ especialidade
+// Listar todos os vínculos
 export async function listarTodosVinculos() {
-  return medicoEspecialidadeModel.getAllVinculos();
+  const db = await connectDB();
+  const [rows] = await db.query(`
+    SELECT 
+      m.id AS id_medico,
+      m.nome AS nome_medico,
+      e.id AS id_especialidade,
+      e.nome AS nome_especialidade
+    FROM Medico_Especialidade me
+    JOIN Medicos m ON m.id = me.id_medico
+    JOIN Especialidades e ON e.id = me.id_especialidade
+  `);
+  return rows;
 }
 
-//  Listar especialidades de um médico específico
+// Listar especialidades de um médico específico
 export async function listarEspecialidadesMedico(id_medico) {
-  if (!id_medico) {
-    throw new Error("ID do médico é obrigatório.");
-  }
+  const db = await connectDB();
 
-  const medico = await medicoModel.findById(id_medico);
-  if (!medico) {
-    throw new Error("Médico não encontrado.");
-  }
+  const [medico] = await db.query("SELECT * FROM Medicos WHERE id = ?", [id_medico]);
+  if (medico.length === 0) return [];
 
-  return medicoEspecialidadeModel.getEspecialidadesMedico(id_medico);
+  const [rows] = await db.query(
+    `SELECT e.id, e.nome 
+     FROM Medico_Especialidade me
+     JOIN Especialidades e ON me.id_especialidade = e.id
+     WHERE me.id_medico = ?`,
+    [id_medico]
+  );
+
+  return rows;
 }
 
-//  Vincular médico e especialidade
+// Criar vínculo
 export async function vincularEspecialidade(id_medico, id_especialidade) {
+  const db = await connectDB();
+
   if (!id_medico || !id_especialidade) {
-    throw new Error("ID do médico e ID da especialidade são obrigatórios.");
+    const err = new Error("Médico e especialidade são obrigatórios");
+    err.status = 400;
+    throw err;
   }
 
-  const medico = await medicoModel.findById(id_medico);
-  if (!medico) {
-    throw new Error("Médico não encontrado.");
+  const [existe] = await db.query(
+    "SELECT * FROM Medico_Especialidade WHERE id_medico = ? AND id_especialidade = ?",
+    [id_medico, id_especialidade]
+  );
+  if (existe.length > 0) {
+    const err = new Error("Vínculo já existente");
+    err.status = 400;
+    throw err;
   }
 
-  const especialidade = await especialidadeModel.findById(id_especialidade);
-  if (!especialidade) {
-    throw new Error("Especialidade não encontrada.");
-  }
+  await db.query(
+    "INSERT INTO Medico_Especialidade (id_medico, id_especialidade) VALUES (?, ?)",
+    [id_medico, id_especialidade]
+  );
 
-  const vinculoExistente = await medicoEspecialidadeModel.findVinculo(id_medico, id_especialidade);
-  if (vinculoExistente) {
-    throw new Error("Este médico já está vinculado a esta especialidade.");
-  }
-
-  const novoId = await medicoEspecialidadeModel.vincular(id_medico, id_especialidade);
-  return medicoEspecialidadeModel.findVinculo(id_medico, id_especialidade);
+  return { message: "Vínculo criado com sucesso" };
 }
 
-//  Atualizar vínculo (alterar a especialidade de um médico)
+// Atualizar vínculo
 export async function atualizarEspecialidade(id_medico, id_especialidade, novo_id_especialidade) {
-  if (!id_medico || !id_especialidade || !novo_id_especialidade) {
-    throw new Error("IDs do médico, especialidade atual e nova especialidade são obrigatórios.");
+  const db = await connectDB();
+
+  const [existe] = await db.query(
+    "SELECT * FROM Medico_Especialidade WHERE id_medico = ? AND id_especialidade = ?",
+    [id_medico, id_especialidade]
+  );
+  if (existe.length === 0) {
+    const err = new Error("Vínculo não encontrado");
+    err.status = 404;
+    throw err;
   }
 
-  const medico = await medicoModel.findById(id_medico);
-  if (!medico) {
-    throw new Error("Médico não encontrado.");
-  }
+  await db.query(
+    "UPDATE Medico_Especialidade SET id_especialidade = ? WHERE id_medico = ? AND id_especialidade = ?",
+    [novo_id_especialidade, id_medico, id_especialidade]
+  );
 
-  const especialidadeAtual = await especialidadeModel.findById(id_especialidade);
-  if (!especialidadeAtual) {
-    throw new Error("Especialidade atual não encontrada.");
-  }
-
-  const novaEspecialidade = await especialidadeModel.findById(novo_id_especialidade);
-  if (!novaEspecialidade) {
-    throw new Error("Nova especialidade não encontrada.");
-  }
-
-  const vinculoExistente = await medicoEspecialidadeModel.findVinculo(id_medico, novo_id_especialidade);
-  if (vinculoExistente) {
-    throw new Error("Este médico já está vinculado à nova especialidade informada.");
-  }
-
-  const sucesso = await medicoEspecialidadeModel.atualizar(id_medico, id_especialidade, novo_id_especialidade);
-  if (!sucesso) {
-    throw new Error("Não foi possível atualizar o vínculo médico ↔ especialidade.");
-  }
-
-  return medicoEspecialidadeModel.findVinculo(id_medico, novo_id_especialidade);
+  return { message: "Vínculo atualizado com sucesso" };
 }
 
-//  Remover vínculo
+// Remover vínculo
 export async function removerEspecialidade(id_medico, id_especialidade) {
-  if (!id_medico || !id_especialidade) {
-    throw new Error("ID do médico e ID da especialidade são obrigatórios para remoção.");
-  }
+  const db = await connectDB();
 
-  const medico = await medicoModel.findById(id_medico);
-  if (!medico) {
-    throw new Error("Médico não encontrado.");
-  }
+  await db.query(
+    "DELETE FROM Medico_Especialidade WHERE id_medico = ? AND id_especialidade = ?",
+    [id_medico, id_especialidade]
+  );
 
-  const especialidade = await especialidadeModel.findById(id_especialidade);
-  if (!especialidade) {
-    throw new Error("Especialidade não encontrada.");
-  }
+  return { message: "Vínculo removido com sucesso" };
+}
 
-  const vinculoExistente = await medicoEspecialidadeModel.findVinculo(id_medico, id_especialidade);
-  if (!vinculoExistente) {
-    throw new Error("O vínculo informado não existe.");
-  }
-
-  const sucesso = await medicoEspecialidadeModel.remover(id_medico, id_especialidade);
-  if (!sucesso) {
-    throw new Error("Não foi possível remover o vínculo médico ↔ especialidade.");
-  }
+// Verifica existência do vínculo
+export async function findVinculo(id_medico, id_especialidade) {
+  const db = await connectDB();
+  const [rows] = await db.query(
+    "SELECT * FROM Medico_Especialidade WHERE id_medico = ? AND id_especialidade = ?",
+    [id_medico, id_especialidade]
+  );
+  return rows.length > 0;
 }
