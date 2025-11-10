@@ -1,0 +1,150 @@
+{
+	"info": {
+		"_postman_id": "c1f2b3e4-a5b6-c7d8-e9f0-g1h2i3j4k5l6",
+		"name": "Consultas API (CRUD)",
+		"description": "Coleção para testar o CRUD da API de agendamento de consultas médicas.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Agendar Consulta (POST)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id_paciente\": 1,\n  \"id_medico\": 2,\n  \"data_agendamento\": \"2025-12-10T10:00:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/consultas",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"consultas"
+					]
+				},
+				"description": "Cria um novo agendamento. Use IDs válidos de paciente e médico existentes. Use uma data/hora futura.\n\n**Resposta Esperada (Sucesso):**\n* **Status:** 201 Created\n* **Body:** JSON com os dados da consulta criada (incluindo `idConsulta`, `nomePaciente`, `nomeMedico`)."
+			},
+			"response": []
+		},
+		{
+			"name": "Listar Todas as Consultas (GET All)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/consultas",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"consultas"
+					]
+				},
+				"description": "Retorna um array com todas as consultas agendadas.\n\n**Resposta Esperada (Sucesso):**\n* **Status:** 200 OK\n* **Body:** Array JSON (pode estar vazio ou conter objetos de consulta)."
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar Consulta por ID (GET by ID)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/consultas/{{consultaId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"consultas",
+						"{{consultaId}}"
+					]
+				},
+				"description": "Retorna os detalhes de uma consulta específica.\n\n**Como usar:**\n1.  Execute \"Agendar Consulta (POST)\".\n2.  Copie o valor de `idConsulta` da resposta.\n3.  Crie ou edite a variável de ambiente `consultaId` com esse valor.\n4.  Execute esta requisição.\n\n**Resposta Esperada (Sucesso):**\n* **Status:** 200 OK\n* **Body:** Objeto JSON com os dados da consulta.\n\n**Resposta Esperada (Erro - ID não existe):**\n* **Status:** 404 Not Found"
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar Consulta (PUT)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\": \"Realizada\",\n    \"observacoes\": \"Paciente compareceu. Atualizado via Postman.\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/consultas/{{consultaId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"consultas",
+						"{{consultaId}}"
+					]
+				},
+				"description": "Atualiza os dados de uma consulta existente. Envie no corpo **apenas** os campos que deseja modificar.\n\n**Como usar:**\n1.  Certifique-se de que a variável `consultaId` contém um ID válido (obtido após um POST).\n2.  Execute esta requisição.\n\n**Resposta Esperada (Sucesso):**\n* **Status:** 200 OK\n* **Body:** Objeto JSON com os dados da consulta atualizada.\n\n**Resposta Esperada (Erro - ID não existe):**\n* **Status:** 404 Not Found"
+			},
+			"response": []
+		},
+		{
+			"name": "Cancelar Consulta (DELETE)",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/consultas/{{consultaId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"consultas",
+						"{{consultaId}}"
+					]
+				},
+				"description": "Remove (cancela) uma consulta do sistema.\n\n**Como usar:**\n1.  Certifique-se de que a variável `consultaId` contém um ID válido.\n2.  Execute esta requisição.\n\n**Resposta Esperada (Sucesso):**\n* **Status:** 204 No Content\n* **Body:** Vazio.\n\n**Resposta Esperada (Erro - ID não existe):**\n* **Status:** 404 Not Found"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "consultaId",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}

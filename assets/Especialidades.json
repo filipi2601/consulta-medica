@@ -1,0 +1,157 @@
+{
+	"info": {
+		"_postman_id": "b2c3d4e5-f6g7-h8i9-j0k1-l2m3n4o5p6q7",
+		"name": "Medico-Especialidade API",
+		"description": "Coleção para testar o CRUD da tabela associativa Medico_Especialidade.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Vincular Médico a Especialidade (POST)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id_medico\": 1,\n  \"id_especialidade\": 2 \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/medico-especialidade",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"medico-especialidade"
+					]
+				},
+				"description": "Cria um novo vínculo entre um médico e uma especialidade.\n\n**Testes de Erro (Baseado no `...test.js`):**\n* **400 (Campos faltando):** Envie `{\"id_medico\": 1}`\n* **400/409 (Duplicata):** Envie `{\"id_medico\": 1, \"id_especialidade\": 1}` (este vínculo já existe no `seedTest.sql`)."
+			},
+			"response": []
+		},
+		{
+			"name": "Listar Todos os Vínculos (GET All)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/medico-especialidade",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"medico-especialidade"
+					]
+				},
+				"description": "Lista todas as associações de médico/especialidade existentes no banco.\n\n**Resposta Esperada (Sucesso):**\n* **Status:** 200 OK\n* **Body:** Array JSON com os vínculos."
+			},
+			"response": []
+		},
+		{
+			"name": "Listar Especialidades de um Médico (GET by Medico ID)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/medico-especialidade/{{medicoId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"medico-especialidade",
+						"{{medicoId}}"
+					]
+				},
+				"description": "Lista todas as especialidades de um médico específico.\n\n**Como usar:**\n* Use `{{medicoId}} = 1` (Dr. Carlos Oliveira, 1 especialidade no seed).\n* Use `{{medicoId}} = 4` (Dra. Beatriz Santos, 2 especialidades no seed).\n\n**Resposta Esperada (Erro - ID não existe):**\n* Use `{{medicoId}} = 999` (Espera 200 com lista vazia ou 404)."
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar Vínculo (PUT)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"novo_id_especialidade\": 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/medico-especialidade/{{medicoId}}/{{especialidadeId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"medico-especialidade",
+						"{{medicoId}}",
+						"{{especialidadeId}}"
+					]
+				},
+				"description": "Atualiza a especialidade de um vínculo médico existente.\n\n**Como usar (Sucesso):**\n1.  O `seedTest.sql` cria o vínculo 1-1 (Dr. Carlos -> Cardiologia).\n2.  Defina `{{medicoId}} = 1`\n3.  Defina `{{especialidadeId}} = 1`\n4.  No `Body`, envie `{\"novo_id_especialidade\": 2}` (para mudar para Dermatologia).\n5.  A resposta deve ser `200 OK` com a mensagem `\"Vínculo atualizado com sucesso!\"`.\n\n**Como usar (Erro):**\n* Tente atualizar um vínculo que não existe (ex: 999/999). A resposta deve ser `404 Not Found`."
+			},
+			"response": []
+		},
+		{
+			"name": "Remover Vínculo (DELETE)",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/medico-especialidade/{{medicoId}}/{{especialidadeId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"medico-especialidade",
+						"{{medicoId}}",
+						"{{especialidadeId}}"
+					]
+				},
+				"description": "Remove um vínculo específico entre um médico e uma especialidade.\n\n**Como usar (Sucesso):**\n* O `seedTest.sql` cria o vínculo 1-1.\n* Defina `{{medicoId}} = 1`\n* Defina `{{especialidadeId}} = 1`\n* A resposta deve ser `204 No Content`.\n\n**Como usar (Erro):**\n* Defina `{{medicoId}} = 999`\n* Defina `{{especialidadeId}} = 999`\n* A resposta deve ser `404 Not Found`."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "medicoId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "especialidadeId",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}

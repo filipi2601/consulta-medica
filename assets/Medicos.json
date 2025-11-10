@@ -1,0 +1,130 @@
+{
+	"info": {
+		"_postman_id": "d4e5f6g7-h8i9-j0k1-l2m3-n4o5p6q7r8s9",
+		"name": "Medicos API (CRUD)",
+		"description": "Coleção para testar o CRUD da API de Médicos.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Criar Médico (POST)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nome\": \"Dra. Juliana Alves\",\n  \"crm\": \"98765-SP\",\n  \"email\": \"juliana.alves@clinica.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/medicos",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"medicos"
+					]
+				},
+				"description": "Cria um novo médico.\n\n**Resposta Esperada (Sucesso):**\n* **Status:** 201 Created\n* **Body:** JSON com os dados do médico criado (incluindo o novo `id`).\n\n**Respostas Esperadas (Erro):**\n* **400/500:** Se o `crm` ou `email` já existir (baseado nas restrições `UNIQUE` do schema)."
+			},
+			"response": []
+		},
+		{
+			"name": "Listar Todos os Médicos (GET All)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/medicos",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"medicos"
+					]
+				},
+				"description": "Retorna um array com todos os médicos cadastrados (o `seedTest.sql` garante 5).\n\n**Resposta Esperada (Sucesso):**\n* **Status:** 200 OK\n* **Body:** Array JSON com os objetos dos médicos."
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar Médico (PUT)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nome\": \"Dr. Carlos Oliveira (Atualizado)\",\n  \"crm\": \"12345-SP\",\n  \"email\": \"carlos.oliveira.novo@clinica.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/medicos/{{medicoId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"medicos",
+						"{{medicoId}}"
+					]
+				},
+				"description": "Atualiza os dados de um médico existente. \n\n**Como usar (Sucesso):**\n* Use `{{medicoId}} = 1` (Dr. Carlos Oliveira, do `seedTest.sql`).\n\n**Resposta Esperada (Sucesso):**\n* **Status:** 200 OK\n* **Body:** JSON com os dados atualizados do médico.\n\n**Resposta Esperada (Erro):**\n* **404:** Se o ID não existir (se o controller tratar o erro do model)."
+			},
+			"response": []
+		},
+		{
+			"name": "Remover Médico (DELETE)",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/medicos/{{medicoId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"medicos",
+						"{{medicoId}}"
+					]
+				},
+				"description": "Remove um médico do sistema.\n\n**⚠️ ATENÇÃO ⚠️**\nO model `medicosModel.js` está configurado para **DELETAR TAMBÉM TODAS AS CONSULTAS** associadas a este médico (`DELETE FROM Consultas WHERE id_medico = ?`). Teste com cuidado!\n\n**Como usar:**\n1.  Crie um médico novo com o (POST) e pegue o ID dele (ex: 6).\n2.  Use esse ID (6) na variável `{{medicoId}}` e rode o DELETE. A resposta deve ser `204 No Content`.\n3.  Tente deletar um médico que não existe (ex: 999). A resposta deve ser `404 Not Found` (baseado no erro que o model joga)."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "medicoId",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}

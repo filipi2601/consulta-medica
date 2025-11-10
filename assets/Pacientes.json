@@ -1,0 +1,150 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+		"name": "Pacientes API (CRUD)",
+		"description": "Coleção para testar o CRUD da API de Pacientes, com base no arquivo de teste.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Criar Paciente (POST)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nome\": \"Fernanda Lima\",\n  \"cpf\": \"66666666666\",\n  \"data_nascimento\": \"1992-09-10\",\n  \"telefone\": \"(11) 96666-6666\",\n  \"email\": \"fernanda.lima@email.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/pacientes",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"pacientes"
+					]
+				},
+				"description": "Cria um novo paciente.\n\n**Respostas Esperadas (Erro 400):**\n* `\"Todos os campos obrigatorios devem ser informados.\"`\n* `\"CPF invalido. Informe 11 digitos.\"`\n* `\"Data de nascimento nao pode ser futura.\"`\n* `\"Ja existe paciente com este CPF.\"`\n* `\"Ja existe paciente com este email.\"`"
+			},
+			"response": []
+		},
+		{
+			"name": "Listar Todos os Pacientes (GET All)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/pacientes",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"pacientes"
+					]
+				},
+				"description": "Retorna um array com todos os pacientes cadastrados (o `seedTest.sql` garante pelo menos 5).\n\n**Resposta Esperada (Sucesso):**\n* **Status:** 200 OK\n* **Body:** Array JSON com os objetos dos pacientes."
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar Paciente por ID (GET by ID)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/pacientes/{{pacienteId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"pacientes",
+						"{{pacienteId}}"
+					]
+				},
+				"description": "(Endpoint inferido do PUT/DELETE) Retorna os detalhes de um paciente específico.\n\n**Como usar:**\n1.  Use `{{pacienteId}}` = `1` (que existe no seu `seedTest.sql`).\n\n**Resposta Esperada (Sucesso):**\n* **Status:** 200 OK\n* **Body:** Objeto JSON com os dados do paciente.\n\n**Resposta Esperada (Erro - ID não existe):**\n* **Status:** 404 Not Found"
+			},
+			"response": []
+		},
+		{
+			"name": "Atualizar Paciente (PUT)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nome\": \"Ana Silva Atualizada\",\n  \"cpf\": \"11111111111\",\n  \"data_nascimento\": \"1990-05-15\",\n  \"telefone\": \"(11) 90000-0001\",\n  \"email\": \"ana.silva@atualizado.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/pacientes/{{pacienteId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"pacientes",
+						"{{pacienteId}}"
+					]
+				},
+				"description": "Atualiza os dados de um paciente existente. Use `{{pacienteId}}` = `1` (Ana Silva) para testar o sucesso.\n\n**Respostas Esperadas (Erro):**\n* **400:** `\"Ja existe paciente com este email.\"` (Tente atualizar o paciente 2 com o email do paciente 1)\n* **404:** `\"Paciente nao encontrado.\"` (Use um ID que não existe)"
+			},
+			"response": []
+		},
+		{
+			"name": "Remover Paciente (DELETE)",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/pacientes/{{pacienteId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"pacientes",
+						"{{pacienteId}}"
+					]
+				},
+				"description": "Remove um paciente do sistema.\n\n**Cuidado:** Se o paciente tiver consultas, a restrição `ON DELETE RESTRICT` do seu banco de dados (na tabela `Consultas`) **pode** impedir a exclusão, retornando um erro 500 (ou 400, dependendo de como o erro é tratado).\n\n**Resposta Esperada (Sucesso - se não tiver consultas):**\n* **Status:** 204 No Content\n* **Body:** Vazio.\n\n**Resposta Esperada (Erro - ID não existe):**\n* **Status:** 404 Not Found\n* **Body:** `{\"message\": \"Paciente nao encontrado.\"}`"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "pacienteId",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
