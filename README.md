@@ -31,7 +31,7 @@ As principais entidades do sistema são:
 
 O banco de dados do sistema foi modelado e implementado no MySQL, com o nome `Modelo_Logico`. Ele é composto por cinco tabelas principais: `Pacientes`, `Medicos`, `Especialidades`, `Consultas` e `Medico_Especialidade` (tabela de relacionamento N:N).
 
-Abaixo está um resumo do script de criação das entidades principais. O código completo pode ser encontrado no arquivo `/database/create_tables.sql`.
+Abaixo está um resumo do script de criação das entidades principais. O código completo pode ser encontrado no arquivo `src/database/schema.sql`.
 
 ```sql
 CREATE TABLE Pacientes (
@@ -75,94 +75,30 @@ CREATE TABLE Consultas (
 );
 ```
 
-### Scripts de Teste e População de Dados
-
-Para validar o funcionamento do sistema e executar os testes iniciais de CRUD, foi criado um conjunto de scripts SQL responsáveis por limpar o banco, inserir dados de exemplo e preparar o ambiente de testes.
-
-Esses scripts podem ser executados diretamente no MySQL após a criação do banco `Modelo_Logico`.
-
-#### 1\. Limpeza do Banco de Dados
-
-```sql
-SET FOREIGN_KEY_CHECKS = 0;
-
-TRUNCATE TABLE `Modelo_Logico`.`Consultas`;
-TRUNCATE TABLE `Modelo_Logico`.`Medico_Especialidade`;
-TRUNCATE TABLE `Modelo_Logico`.`Medicos`;
-TRUNCATE TABLE `Modelo_Logico`.`Pacientes`;
-TRUNCATE TABLE `Modelo_Logico`.`Especialidades`;
-
-SET FOREIGN_KEY_CHECKS = 1;
-```
-
-#### 2\. Inserção de Dados de Teste
-
-**Especialidades**
-
-```sql
-INSERT INTO `Especialidades` (nomeEspecialidade) VALUES
-('Cardiologia'),
-('Dermatologia'),
-('Ortopedia'),
-('Pediatria'),
-('Ginecologia'),
-('Clínica Geral');
-```
-
-**Pacientes**
-
-```sql
-INSERT INTO `Pacientes` (nomePaciente, cpfPaciente, data_nascimentoPaciente, telefonePaciente, emailPaciente) VALUES
-('Ana Silva', '111.111.111-11', '1990-05-15', '(11) 91111-1111', 'ana.silva@email.com'),
-('Bruno Costa', '222.222.222-22', '1985-02-20', '(11) 92222-2222', 'bruno.costa@email.com'),
-('Carla Dias', '333.333.333-33', '2000-11-30', NULL, 'carla.dias@email.com'),
-('Daniel Moreira', '444.444.444-44', '1995-08-01', '(11) 94444-4444', 'daniel.moreira@email.com'),
-('Elisa Fernandes', '555.555.555-55', '1988-12-10', '(11) 95555-5555', 'elisa.fernandes@email.com');
-```
-
-**Médicos**
-
-```sql
-INSERT INTO `Medicos` (nomeMedico, crmMedico, emailMedico) VALUES
-('Dr. Carlos Oliveira', '12345-SP', 'carlos.oliveira@clinica.com'),
-('Dra. Sofia Martins', '67890-RJ', 'sofia.martins@clinica.com'),
-('Dr. Lucas Almeida', '11223-MG', 'lucas.almeida@clinica.com'),
-('Dra. Beatriz Santos', '44556-SP', 'beatriz.santos@clinica.com'),
-('Dr. Rafael Pereira', '77889-BA', 'rafael.pereira@clinica.com');
-```
-
-**Relacionamentos (Médico ↔ Especialidade)**
-
-```sql
-INSERT INTO `Medico_Especialidade` (id_medico, id_especialidade) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(4, 6),
-(5, 5);
-```
-
 -----
 
 ## Arquitetura do Código e Responsabilidades dos Módulos
 
 O projeto foi desenvolvido em Node.js utilizando o framework Express, adotando uma arquitetura modular, onde cada módulo possui uma responsabilidade específica:
 
-  * **server.js:** Arquivo principal de inicialização do servidor.
+  * **server.js:** Ponto de entrada que importa o app e inicia o servidor.
+  * **app.js:** Define e configura a instância da aplicação.
   * **routes/:** Contém as rotas de cada entidade (Paciente, Médico, Consulta, etc.).
-  * **controllers/:** Implementa as regras de negócio e manipulação das requisições.
+  * **controllers/:** Realiza o controle das implementações.
   * **models/:** Define a estrutura das tabelas e interações com o banco de dados MySQL.
-  * **tests/:** Conjunto de testes unitários desenvolvidos com o framework Jest.
+  * **services/:** Conjunto que engobla as regras da aplicação.
+  * **config/:** Responsavel pelo conexão com banco de dados.
+  * **database/:** Armazenamento dos Scripts padrão.
 
 Essa separação de responsabilidades visa garantir maior organização, escalabilidade e facilidade de manutenção do código.
 
 -----
 
-## Exemplos de Consultas SQL Implementadas
+## Exemplos de Comandos SQL Implementados
 
-A seguir estão alguns exemplos de consultas SQL desenvolvidas e testadas no projeto, refletindo o funcionamento real do banco de dados.
+A seguir estão alguns exemplos de comandos SQL desenvolvidas e testados no projeto, refletindo o funcionamento real do banco de dados.
 
+**Exemplo de SELECT:**
 **Listar todas as consultas com o nome do paciente, médico e especialidade**
 
 ```sql
@@ -179,44 +115,28 @@ JOIN Medicos m ON c.idMedico = m.idMedico
 JOIN Medico_Especialidade me ON me.id_medico = m.idMedico
 JOIN Especialidades e ON me.id_especialidade = e.idEspecialidade;
 ```
-
-**Exibir o total de médicos cadastrados por especialidade**
-
-```sql
-SELECT
-  e.nomeEspecialidade AS Especialidade,
-  COUNT(me.id_medico) AS Total_Medicos
-FROM Especialidades e
-JOIN Medico_Especialidade me ON e.idEspecialidade = me.id_especialidade
-GROUP BY e.nomeEspecialidade;
-```
-
-**Listar as consultas realizadas por um paciente específico**
+Exemplo de INSERT INTO:
+**Insere uma consulta no Banco**
 
 ```sql
-SELECT
-  c.idConsulta,
-  m.nomeMedico,
-  c.data_agendamentoConsulta,
-  c.statusConsulta
-FROM Consultas c
-JOIN Medicos m ON c.idMedico = m.idMedico
-WHERE c.idPaciente = 1;
+INSERT INTO Consultas (id_paciente, id_medico, data_agendamento) 
+    VALUES (?, ?, ?)
 ```
 
-**Exibir todas as consultas agendadas em determinada data**
+Exemplo de UPDATE:
+**Atualiza um registro no Banco**
+```sql
+UPDATE Consultas SET ${campos} WHERE id = ?
+```
+
+Exemplo de DELETE:
+** Exclui um registro do Banco**
 
 ```sql
-SELECT
-  c.idConsulta,
-  p.nomePaciente,
-  m.nomeMedico,
-  c.data_agendamentoConsulta
-FROM Consultas c
-JOIN Pacientes p ON c.idPaciente = p.idPaciente
-JOIN Medicos m ON c.idMedico = m.idMedico
-WHERE DATE(c.data_agendamentoConsulta) = '2025-10-25';
-```
+DELETE FROM Consultas WHERE id = ?
+````
+
+
 
 -----
 
@@ -233,8 +153,8 @@ Certifique-se de ter instalado:
 ### 2\. Clonando o Repositório
 
 ```bash
-git clone https://github.com/usuario/sistema-clinico.git
-cd sistema-clinico
+git clone https://github.com/filipi2601/consulta-medica.git
+cd consulta-medica
 ```
 
 ### 3\. Instalando as Dependências
@@ -245,18 +165,17 @@ npm install
 
 ### 4\. Configuração do Banco de Dados
 
-Crie um banco no MySQL com o nome `clinica_db` (ou o nome que preferir).
+Crie um banco no MySQL com o nome `Modelo_Logico` (ou o nome que preferir).
 
 ```sql
-CREATE DATABASE IF NOT EXISTS clinica_db;
+CREATE DATABASE IF NOT EXISTS Modelo_Logico;
 ```
 
-Execute os scripts contidos na pasta `/database`:
+### Abrir o Workbench.
 
-```bash
-mysql -u root -p clinica_db < create_tables.sql
-mysql -u root -p clinica_db < insert_data.sql
-```
+   * Ir em File > Open SQL Script.
+   * Selecionar o arquivo src/database/schema.sql.
+   * Clicar no botão ⚡ (Executar) para rodar o script.
 
 No arquivo `.env`, configure:
 
@@ -264,7 +183,7 @@ No arquivo `.env`, configure:
 DB_HOST=localhost
 DB_USER=root
 DB_PASS=sua_senha
-DB_NAME=clinica_db
+DB_NAME=Modelo_Logico
 ```
 
 ### 5\. Executando o Servidor
@@ -287,7 +206,7 @@ Os testes utilizam o framework Jest e podem ser encontrados na pasta `/tests`.
 
 ## Endpoints da API
 
-A API foi desenvolvida em Node.js (Express) e segue o padrão RESTful, estruturando os módulos de forma independente para cada entidade: Pacientes, Médicos, Consultas e Médico-Especialidade. Os testes podem ser realizados por meio das coleções Postman disponíveis na pasta `/collections`.
+A API foi desenvolvida em Node.js (Express) e segue o padrão RESTful, estruturando os módulos de forma independente para cada entidade: Pacientes, Médicos, Consultas e Médico-Especialidade. Os testes podem ser realizados por meio das coleções Postman disponíveis na pasta `/assets`.
 
 ### Pacientes API (CRUD)
 
@@ -623,7 +542,7 @@ Para testar os endpoints localmente:
 1.  Abra o Postman.
 2.  Clique em **Import** \> **File**.
 3.  Selecione a coleção desejada (ex: `Pacientes API (CRUD).json`).
-4.  Configure a variável `baseUrl` como `http://localhost:3000`.
+4.  Configure a variável `baseUrl` com o endereço do servidor, normalmente: `http://localhost:3000`.
 5.  Execute as requisições conforme os exemplos.
 
 ### Arquivos do Projeto
