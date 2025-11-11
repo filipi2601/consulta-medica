@@ -20,14 +20,17 @@
   },
   "homepage": "https://github.com/filipi2601/consulta-medica#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "mysql2": "^3.15.3"
+    "mysql2": "^3.15.3",
+    "node": "^25.1.0"
   },
   "devDependencies": {
     "install": "^0.13.0",
     "jest": "^30.2.0",
     "nodemon": "^3.1.0",
     "supertest": "^7.1.4"
-  }
+  },
+  "keywords": []
 }

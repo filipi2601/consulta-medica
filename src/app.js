@@ -9,9 +9,9 @@ import { connectDB } from "./config/db.js";
 const app = express();
 app.use(express.json());
 app.use("/api/consultas", consultaRoutes);
+app.use("/api/medicos", medicosRoutes);
 app.use("/api/especialidades", especialidadesRoutes);
 app.use("/api/pacientes", pacientesRoutes);
-app.use("/api/medicos", medicosRoutes);
 app.use("/api/medico-especialidade", medicoEspecialidadeRoute);
 
 app.get("/", async (req, res) => {
