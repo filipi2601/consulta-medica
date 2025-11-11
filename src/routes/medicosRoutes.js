@@ -1,16 +1,12 @@
-import { Router } from "express";
-import {
-  getMedicos,
-  createMedico,
-  updateMedico,
-  deleteMedico,
-} from "../controllers/medicosController.js";
+import express from "express";
+import * as medicosController from "../controllers/medicosController.js";
 
-const router = Router();
+const router = express.Router();
 
-router.get("/", getMedicos);
-router.post("/", createMedico);
-router.put("/:id", updateMedico);
-router.delete("/:id", deleteMedico);
+router.get("/", medicosController.listar);
+router.get("/:id", medicosController.buscarPorId);
+router.post("/", medicosController.criar);
+router.put("/:id", medicosController.atualizar);
+router.delete("/:id", medicosController.remover);
 
 export default router;

@@ -1,47 +1,83 @@
-import * as medicosModel from "../models/medicosModel.js";
+import * as medicosService from "../services/medicosService.js";
 
-export async function getMedicos(req, res) {
+// ✅ Listar todos os médicos
+export async function listar(req, res) {
   try {
-    const medicos = await medicosModel.getMedicos();
-    return res.json(medicos);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+    const medicos = await medicosService.listarTodos(); // nome certo da função no service
+    res.status(200).json(medicos);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 }
 
-export async function createMedico(req, res) {
+// ✅ Buscar médico por ID
+export async function buscarPorId(req, res) {
+  try {
+    const { id } = req.params;
+    const medico = await medicosService.buscarPorId(id);
+
+    if (!medico) {
+      return res.status(404).json({ message: "Médico não encontrado" });
+    }
+
+    res.status(200).json(medico);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+// ✅ Criar novo médico
+export async function criar(req, res) {
   try {
     const { nome, crm, email } = req.body;
+
     if (!nome || !crm) {
-      return res.status(400).json({ error: "nome e crm são obrigatórios" });
+      return res.status(400).json({ message: "Nome e CRM são obrigatórios" });
     }
-    const medico = await medicosModel.addMedico({ nome, crm, email });
-    return res.status(201).json(medico);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+
+    const novoMedico = await medicosService.criar({ nome, crm, email });
+    res.status(201).json({ message: "Médico criado com sucesso", medico: novoMedico });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 }
 
-export async function updateMedico(req, res) {
+// ✅ Atualizar médico
+export async function atualizar(req, res) {
   try {
-    const id = Number(req.params.id);
+    const { id } = req.params;
     const { nome, crm, email } = req.body;
-    const medico = await medicosModel.updateMedico(id, { nome, crm, email });
-    return res.json(medico);
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+
+    // Só atualiza os campos que foram enviados
+    const campos = {};
+    if (nome !== undefined) campos.nome = nome;
+    if (crm !== undefined) campos.crm = crm;
+    if (email !== undefined) campos.email = email;
+
+    const atualizado = await medicosService.atualizar(id, campos);
+
+    if (!atualizado) {
+      return res.status(404).json({ message: "Médico não encontrado" });
+    }
+
+    res.status(200).json({ message: "Médico atualizado com sucesso" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 }
 
-export async function deleteMedico(req, res) {
+// ✅ Remover médico
+export async function remover(req, res) {
   try {
-    const id = req.params.id;
-    await medicosModel.deleteMedico(id);
-    return res.status(204).send();
-  } catch (err) {
-    if (err) {
-      return res.status(404).json({ error: err.message });
+    const { id } = req.params;
+    const removido = await medicosService.remover(id);
+
+    if (!removido) {
+      return res.status(404).json({ message: "Médico não encontrado" });
     }
-    return res.status(500).json({ error: err.message });
+
+    res.status(200).json({ message: "Médico removido com sucesso" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 }
